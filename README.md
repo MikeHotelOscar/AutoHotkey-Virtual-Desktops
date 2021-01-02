@@ -13,4 +13,4 @@ Setup for the library's use is done simply by calling VD_Init() or VD_InitNoWrap
 
 Using VD_ChangeDesktopOrMoveWindow(num, key) allows you to set any key as an extra modifier for a hotkey that will move the active window to the target desktop if it is held down, or simply move to the target desktop if it is not.
 
-During the Auto-Execute section of a script, you can define a number of desktop names in the form of Desktop(Number)Name, like Desktop1Name, and as long as Desktop1Name is not empty, the name of that desktop will be displayed briefly after changing to it. 
+During the Auto-Execute section of a script, you can define a number of desktop names in the form of Global Desktop(Number)Name := "SomeName", like Global Desktop1Name := "SomeName", and as long as Desktop1Name is not empty, the name of that desktop will be displayed briefly after changing to it. 
