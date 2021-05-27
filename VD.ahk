@@ -4,26 +4,16 @@
 ;Original Here:
 ;https://github.com/pmb6tz/windows-desktop-switcher
 ;{Initiate
-VD_Init(){
+VD_Init(Wrap_Desktop := 0, Use_Labels := 0, Use_Names := 0){
 	Global DesktopCount := 2        ; Windows starts with 2 desktops at boot
 	Global CurrentDesktop := 1      ; Desktop count is 1-indexed (Microsoft numbers them this way)
 	Global LastOpenedDesktop := 1
 	global hVirtualDesktopAccessor := DllCall("LoadLibrary", "Str", A_ScriptDir . "\Lib\VirtualDesktopAccessor.dll", "Ptr")
 	global IsWindowOnDesktopNumberProc := DllCall("GetProcAddress", Ptr, hVirtualDesktopAccessor, AStr, "IsWindowOnDesktopNumber", "Ptr")
 	global MoveWindowToDesktopNumberProc := DllCall("GetProcAddress", Ptr, hVirtualDesktopAccessor, AStr, "MoveWindowToDesktopNumber", "Ptr")
-	global WrapDesktop := 1
-	VD_mapDesktopsFromRegistry()
-}
-;}
-;{Initiate - NoWrap
-VD_InitNoWrap(){
-	Global DesktopCount := 2        ; Windows starts with 2 desktops at boot
-	Global CurrentDesktop := 1      ; Desktop count is 1-indexed (Microsoft numbers them this way)
-	Global LastOpenedDesktop := 1
-	global hVirtualDesktopAccessor := DllCall("LoadLibrary", "Str", A_ScriptDir . "\Lib\VirtualDesktopAccessor.dll", "Ptr")
-	global IsWindowOnDesktopNumberProc := DllCall("GetProcAddress", Ptr, hVirtualDesktopAccessor, AStr, "IsWindowOnDesktopNumber", "Ptr")
-	global MoveWindowToDesktopNumberProc := DllCall("GetProcAddress", Ptr, hVirtualDesktopAccessor, AStr, "MoveWindowToDesktopNumber", "Ptr")
-	global WrapDesktop := 0
+	global WrapDesktop := Wrap_Desktop
+	global UseLabels := Use_Labels
+	global UseNames := Use_Names
 	VD_mapDesktopsFromRegistry()
 }
 ;}
@@ -122,16 +112,14 @@ VD_switchDesktopToTarget(targetDesktop)
     while(CurrentDesktop > targetDesktop) {
         Send {LWin down}{LCtrl down}{Left down}{Lwin up}{LCtrl up}{Left up}
         CurrentDesktop--
-		sleep 50
+		sleep 100
         OutputDebug, [left] target: %targetDesktop% current: %CurrentDesktop%
     }
 
     ; Makes the WinActivate fix less intrusive
     Sleep, 50
     VD_focusTheForemostWindow(targetDesktop)
-	if (Global Desktop1Name){
-		VD_DisplayDesktopName()
-	}
+	SetTimer, VD_DisplayDesktopName, -400
 }
 ;}
 ;{Update Global Variables
@@ -233,10 +221,8 @@ VD_createVirtualDesktop()
     Send, #^d
     DesktopCount++
     CurrentDesktop := DesktopCount
-	if (Global Desktop1Name){
-		VD_DisplayDesktopName()
-	}
-    OutputDebug, [create] desktops: %DesktopCount% current: %CurrentDesktop%
+	SetTimer, VD_DisplayDesktopName, -400
+	OutputDebug, [create] desktops: %DesktopCount% current: %CurrentDesktop%
 }
 ;}
 ;{Delete Current Desktop
@@ -252,24 +238,56 @@ VD_deleteVirtualDesktop()
     }
     DesktopCount--
     CurrentDesktop--
-	if (Global Desktop1Name){
-		VD_DisplayDesktopName()
-	}
-    OutputDebug, [delete] desktops: %DesktopCount% current: %CurrentDesktop%
+	SetTimer, VD_DisplayDesktopName, -400
+	OutputDebug, [delete] desktops: %DesktopCount% current: %CurrentDesktop%
 }
 ;}
 ;{Display Desktop Names
 ;
 ; This will display the name of the current desktop when it is activated
 ;
+/*
+UseLabels\UseNames	|0		|1		
+				0	|A		|B
+				1	|C		|D
+
+Behavior A: No Labels Whatsoever
+Behavior B: Only display labels when on Named desktops, labels are the names
+Behavior C: Use Labels on All Desktops, Lables are all Desktop Numbers
+Behavior D: Use Labels on All Desktops, Labels are Desktop Numbers, except when Desktops are named
+
+*/
 VD_DisplayDesktopName(){
-	Global CurrentDesktop
+	Global CurrentDesktop, UseLabels, UseNames
 	SplashWidth := 140
+	SplashWidth2 := 40
 	Width := ((A_ScreenWidth-SplashWidth) / 2)
+	Width2 := ((A_ScreenWidth-SplashWidth2) / 2)
 	Height := A_ScreenHeight / 2
-	SleepTime := 800
+	Height2 := A_ScreenHeight / 2
+	SleepTime := 500
 	Desktop := Global Desktop%CurrentDesktop%Name
-	SplashImage,, w%SplashWidth% x%Width% y%Height% b fs10, % Desktop
+	sleep, 200
+	if (UseLabels){
+		if (UseNames){
+			if (Desktop){
+				SplashImage,, w%SplashWidth% x%Width% y%Height% b fs10, % Desktop
+			}
+			if (!Desktop){
+				SplashImage,, w%SplashWidth2% x%Width2% y%Height2% b fs10, %CurrentDesktop%
+			}	
+		}
+		if (!UseNames){
+			SplashImage,, w%SplashWidth2% x%Width2% y%Height2% b fs10, %CurrentDesktop%
+		}
+	}
+	if (!UseLabels){
+		if (UseNames){
+			if (Desktop){
+				SplashImage,, w%SplashWidth% x%Width% y%Height% b fs10, % Desktop
+			}
+		}
+	}
 	Sleep, %SleepTime%
 	SplashImage, Off
 }
