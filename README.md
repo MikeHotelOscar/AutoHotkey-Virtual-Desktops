@@ -7,8 +7,11 @@ Please read the readme for the original [here](https://github.com/pmb6tz/windows
 
 ## In addition to the work done by pmb6tz I have added a few extra features:
 
-Setup for the library's use is done simply by calling VD_Init() or VD_InitNoWrap() in a script's Auto-Execute section. The only difference between the two is that VD_InitNoWrap will not allow you to "wrap around" when moving left and right among desktops. In other words, if you have 6 desktops, you cannot use VD_switchDesktopToRight() to move to desktop 1 from desktop 6, nor can you use VD_switchDesktopToLeft() to move to desktop 1 to desktop 6.
+Setup for the library's use is done simply by calling VD_Init(). VD_Init() has 3 parameters, all of which are optional and are binary. The first is Wrap_desktop, which allows the ability to move left on the first desktop to get to the last, and right on the last desktop to get to the first. The other two parameters, UseLabels and UseNames, in that order, allow one to provide a display that provides a name or number on a desktop when it becomes the active desktop. Names are provided by creating global variables in the Auto-Execute section of a script with the names of the desktops in the form Global Desktop(Number)Name := "SomeName". The variables create the following behavior when used in a particular way:
+
+* Both 0: No labels at all
+* UseLabels = 0 and UseNames = 1: Only display labels on named desktops, labels are the names provided
+* UseLabels = 1 and UseNames = 0: Labels are displayed on all desktops, labels are desktop numbers
+* Both 1: Labels are displayed on all desktops, labels are desktop numbers, unless a name is provided.
 
 Using VD_ChangeDesktopOrMoveWindow(num, key) allows you to set any key as an extra modifier for a hotkey that will move the active window to the target desktop if it is held down, or simply move to the target desktop if it is not.
-
-During the Auto-Execute section of a script, you can define a number of desktop names in the form of Global Desktop(Number)Name := "SomeName", like Global Desktop1Name := "SomeName", and as long as Desktop1Name is not empty, the name of that desktop will be displayed briefly after changing to it. 
