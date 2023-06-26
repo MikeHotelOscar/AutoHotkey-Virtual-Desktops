@@ -1,11 +1,15 @@
 # AutoHotkey-Virtual-Desktops
 DEVELOPED ON WINDOWS 10, CONFIRMED WORKING ON WINDOWS 11
 
-This is a library plus a DLL that allows one to control Windows 10 Virtual Desktops using AutoHotkey.
+This is a library plus one of three DLLs that allows one to control Windows 10 Virtual Desktops using AutoHotkey.
 
 Originally developed by Github user pmb6tz as a set of functions accomplishing the same goal, I have turned that into a [library](https://www.autohotkey.com/docs/Functions.htm#lib) that allows one to call these functions without an #include statement. Simply place both VD.ahk and VirtualDesktopAccessor.dll into an applicable Library folder, call the functions you desire, and voilà!
 
 Please read the readme for the original [here](https://github.com/pmb6tz/windows-desktop-switcher) first
+
+## DLL CHOICE
+On Windows 10, the newer DLL can cause issues with older versions, specifically anything up to and including update 1809/1903. If you are using a newer version of windows, use the newer DLL, otherwise, use the older. Use the Windows 11 DLL on Windows 11.
+### YOU MUST RENAME YOUR DLL TO VirtualDesktopAccessor.dll
 
 ## In addition to the work done by pmb6tz I have added a few extra features:
 
