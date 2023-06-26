@@ -3,7 +3,7 @@
 ;Modified by Hunter Oakes
 ;Original Here:
 ;https://github.com/pmb6tz/windows-desktop-switcher
-;{Initiate
+
 VD_Init(Wrap_Desktop := 0, Use_Labels := 0, Use_Names := 0){
 	Global DesktopCount := 2        ; Windows starts with 2 desktops at boot
 	Global CurrentDesktop := 1      ; Desktop count is 1-indexed (Microsoft numbers them this way)
@@ -16,8 +16,7 @@ VD_Init(Wrap_Desktop := 0, Use_Labels := 0, Use_Names := 0){
 	global UseNames := Use_Names
 	VD_mapDesktopsFromRegistry()
 }
-;}
-;{Map Desktops from Registry
+
 VD_mapDesktopsFromRegistry() 
 {
     global CurrentDesktop, DesktopCount
@@ -60,11 +59,7 @@ VD_mapDesktopsFromRegistry()
         i++
     }
 }
-;}
-;{Get Session ID
-;
-; This functions finds out ID of current session.
-;
+
 VD_getSessionId()
 {
     ProcessId := DllCall("GetCurrentProcessId", "UInt")
@@ -82,8 +77,7 @@ VD_getSessionId()
     OutputDebug, Current Session Id: %SessionId%
     return SessionId
 }
-;}
-;{Switch Desktop to Target Desktop
+
 VD_switchDesktopToTarget(targetDesktop)
 {
     ; Globals variables should have been updated via VD_updateGlobalVariables() prior to entering this function
@@ -121,32 +115,28 @@ VD_switchDesktopToTarget(targetDesktop)
     VD_focusTheForemostWindow(targetDesktop)
 	SetTimer, VD_DisplayDesktopName, -400
 }
-;}
-;{Update Global Variables
+
 VD_updateGlobalVariables() 
 {
     ; Re-generate the list of desktops and where we fit in that. We do this because
     ; the user may have switched desktops via some other means than the script.
     VD_mapDesktopsFromRegistry()
 }
-;}
-;{Switch Desktop by Number
+
 VD_switchDesktopByNumber(targetDesktop)
 {
     global CurrentDesktop, DesktopCount
     VD_updateGlobalVariables()
     VD_switchDesktopToTarget(targetDesktop)
 }
-;}
-;{Switch to Last Opened Desktop
+
 VD_switchDesktopToLastOpened()
 {
     global CurrentDesktop, DesktopCount, LastOpenedDesktop
     VD_updateGlobalVariables()
     VD_switchDesktopToTarget(LastOpenedDesktop)
 }
-;}
-;{Move to next right desktop
+
 VD_switchDesktopToRight()
 {
     global CurrentDesktop, DesktopCount, WrapDesktop
@@ -158,8 +148,7 @@ VD_switchDesktopToRight()
 		VD_switchDesktopToTarget(CurrentDesktop == DesktopCount ? CurrentDesktop : CurrentDesktop + 1)
 	}
 }
-;}
-;{Move to next left desktop
+
 VD_switchDesktopToLeft()
 {
     global CurrentDesktop, DesktopCount, WrapDesktop
@@ -171,22 +160,19 @@ VD_switchDesktopToLeft()
 		VD_switchDesktopToTarget(CurrentDesktop == 1 ? CurrentDesktop : CurrentDesktop - 1)
 	}
 }
-;}
-;{Activate Foremost window on some desktop
+
 VD_focusTheForemostWindow(targetDesktop) {
     foremostWindowId := VD_getForemostWindowIdOnDesktop(targetDesktop)
     if VD_isWindowNonMinimized(foremostWindowId) {
         WinActivate, ahk_id %foremostWindowId%
     }
 }
-;}
-;{Check if window is not minimied
+
 VD_isWindowNonMinimized(windowId) {
     WinGet MMX, MinMax, ahk_id %windowId%
     return MMX != -1
 }
-;}
-;{Get Foremost Window On Some Desktop
+
 VD_getForemostWindowIdOnDesktop(n)
 {
     n := n - 1 ; Desktops start at 0, while in script it's 1
@@ -202,19 +188,14 @@ VD_getForemostWindowIdOnDesktop(n)
         }
     }
 }
-;}
-;{Move Active Window to New Desktop
+
 VD_MoveCurrentWindowToDesktop(desktopNumber) {
     WinGet, activeHwnd, ID, A
 	global MoveWindowToDesktopNumberProc
     DllCall(MoveWindowToDesktopNumberProc, UInt, activeHwnd, UInt, desktopNumber - 1)
 	VD_switchDesktopByNumber(desktopNumber)
 }
-;}
-;{Create New Desktop
-;
-; This function creates a new virtual desktop and switches to it
-;
+
 VD_createVirtualDesktop()
 {
     global CurrentDesktop, DesktopCount
@@ -224,11 +205,7 @@ VD_createVirtualDesktop()
 	SetTimer, VD_DisplayDesktopName, -400
 	OutputDebug, [create] desktops: %DesktopCount% current: %CurrentDesktop%
 }
-;}
-;{Delete Current Desktop
-;
-; This function deletes the current virtual desktop
-;
+
 VD_deleteVirtualDesktop()
 {
     global CurrentDesktop, DesktopCount, LastOpenedDesktop
@@ -241,11 +218,8 @@ VD_deleteVirtualDesktop()
 	SetTimer, VD_DisplayDesktopName, -400
 	OutputDebug, [delete] desktops: %DesktopCount% current: %CurrentDesktop%
 }
-;}
-;{Display Desktop Names
-;
+
 ; This will display the name of the current desktop when it is activated
-;
 /*
 UseLabels\UseNames	|0		|1		
 				0	|A		|B
@@ -255,8 +229,8 @@ Behavior A: No Labels Whatsoever
 Behavior B: Only display labels when on Named desktops, labels are the names
 Behavior C: Use Labels on All Desktops, Lables are all Desktop Numbers
 Behavior D: Use Labels on All Desktops, Labels are Desktop Numbers, except when Desktops are named
-
 */
+
 VD_DisplayDesktopName(){
 	Global CurrentDesktop, UseLabels, UseNames
 	SplashWidth := 140
@@ -291,11 +265,8 @@ VD_DisplayDesktopName(){
 	Sleep, %SleepTime%
 	SplashImage, Off
 }
-;}
-;{Change Desktop Or Move Window
-;
+
 ; This will move the window to the selected desktop if "key" is pressed, or just go to that desktop if it is not
-;
 VD_ChangeDesktopOrMoveWindow(num, key){
 	If GetKeyState(key, "P"){
 		VD_MoveCurrentWindowToDesktop(num)
@@ -304,4 +275,41 @@ VD_ChangeDesktopOrMoveWindow(num, key){
 		VD_switchDesktopByNumber(num)
 	}
 }
-;}
+
+VD_ChangeDesktopRightOrMoveWindow(key){
+	if (this.WrapDesktop){
+		if GetKeyState(key, "P"){
+			this.MoveCurrentWindowToDesktop(this.CurrentDesktop == this.DesktopCount ? 1 : this.CurrentDesktop + 1)
+		}
+		else{
+			this.switchDesktopToRight()
+		}
+	}
+	else{
+		if GetKeyState(key, "P"){
+			this.MoveCurrentWindowToDesktop(this.CurrentDesktop == this.DesktopCount ? this.CurrentDesktop : this.CurrentDesktop + 1)
+		}
+		else{
+			this.switchDesktopToRight()
+		}
+	}
+}
+
+VD_ChangeDesktopLeftOrMoveWindow(key){
+	if (this.WrapDesktop){
+		if GetKeyState(key, "P"){
+			this.MoveCurrentWindowToDesktop(this.CurrentDesktop == 1 ? this.DesktopCount : this.CurrentDesktop - 1)
+		}
+		else{
+			this.switchDesktopToLeft()
+		}
+	}
+	else{
+		if GetKeyState(key, "P"){
+			this.MoveCurrentWindowToDesktop(this.CurrentDesktop == 1 ? this.CurrentDesktop : this.CurrentDesktop - 1)
+		}
+		else{
+			this.switchDesktopToLeft()
+		}
+	}
+}
